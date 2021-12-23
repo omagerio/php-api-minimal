@@ -3,6 +3,24 @@ class ApiHelper {
         this.url = "../api/api.php";
     }
 
+    /**
+     * Makes a GET request to the server. Parameters are placed in the query string.
+     * @param {object} parameters
+     * @returns Raw server response
+     */
+    async get(parameters) {
+        return await this._call("get", parameters);
+    }
+
+    /**
+     * Makes a POST request to the server. Parameters are placed in the request body.
+     * @param {object} parameters
+     * @returns Raw server response
+     */
+    async post(parameters) {
+        return await this._call("post", parameters);
+    }
+
     _call(method, parameters) {
         return new Promise(
             (resolve) => {
@@ -30,13 +48,5 @@ class ApiHelper {
             }
         );
 
-    }
-
-    async get(parameters) {
-        return await this._call("get", parameters);
-    }
-
-    async post(parameters) {
-        return await this._call("post", parameters);
     }
 }
