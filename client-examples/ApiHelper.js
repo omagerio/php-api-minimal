@@ -1,6 +1,6 @@
 class ApiHelper {
-    constructor() {
-        this.url = "../api/";
+    constructor(url) {
+        this.url = url;
     }
 
     /**
