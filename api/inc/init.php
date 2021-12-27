@@ -5,6 +5,7 @@ ini_set("display_errors", 1);
 if (!file_exists(__DIR__ . "/../env.php")) {
     die("Missing env.php file in api folder");
 }
+
 require(__DIR__ . "/../env.php");
 require(__DIR__ . "/rb.php");
 require(__DIR__ . "/config.php");
@@ -20,6 +21,21 @@ class ApiResponse
         $this->results = array();
         $this->errors = array();
         $this->timestamp = microtime(true);
+    }
+}
+
+$apiHandlers = array();
+
+function addApiHandler($handler)
+{
+    global $apiHandlers;
+    $apiHandlers[] = $handler;
+}
+
+$handlersFiles = scandir(__DIR__ . "/../handlers");
+foreach ($handlersFiles as $handlerFile) {
+    if (substr($handlerFile, -4) == ".php") {
+        include(__DIR__ . "/../handlers/" . $handlerFile);
     }
 }
 
@@ -47,7 +63,10 @@ try {
     if ($jsonError) {
         throw new Exception("Json Error: " . $jsonError);
     }
-    $response = handleRequest($request, $response);
+
+    foreach ($apiHandlers as $apiHandler) {
+        $response = call_user_func($apiHandler, $request, $response);
+    }
 } catch (Exception $e) {
     $response->errors[] = $e->getMessage();
 }

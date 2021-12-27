@@ -5,9 +5,9 @@ A minimal PHP API server to be used as a starting point. Includes RedBeanORM (op
 ## Usage
 - Clone or copy the repository
 - Copy the "api" folder inside a folder reachable by the internet
-- Edit the api.php script by defining your custom logic. `$request` contains the request's parameters. `$response` is the object returned to the clients.
+- Create new handlers inside the "handlers" folder (you can start from the main.php script). Script inside this folder are included automatically. Define your custom logic here: `$request` contains the request's parameters. `$response` is the object returned to the clients.
 - (Optional) Edit the `inc/config.php` script by adding your database connection. Update the `env.php` script accordingly (copy from `env.php.example`)
-- Send GET or POST requests to `yourdomain.com/api/api.php`
+- Send GET or POST requests to `yourdomain.com/api/`
 
 ## Client Example
 Take a look at `client-examples/javascript.html` to see an example of JavaScript usage.

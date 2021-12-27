@@ -1,6 +1,6 @@
 class ApiHelper {
     constructor() {
-        this.url = "../api/api.php";
+        this.url = "../api/";
     }
 
     /**
