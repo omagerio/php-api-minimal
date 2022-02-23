@@ -68,6 +68,7 @@ try {
         throw new Exception("Json Error: " . $jsonError);
     }
 
+    $request->headers = getallheaders();
     $response = handleRequest($request);
 
 } catch (Exception $e) {
