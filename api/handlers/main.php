@@ -1,12 +1,9 @@
 <?php
-addApiHandler(function ($request, ApiResponse $response) {
 
+if (isset($request->action)) {
+    if ($request->action == "hello") {
+        $response->results[] = "world";
 
-    if (isset($request->hello)) {
-        $response->results[] = "Hello World";
+        return $response;
     }
-    return $response;
-
-
-
-});
+}

@@ -2,8 +2,15 @@
 <script>
 
     let api = new ApiHelper("../api/");
-    api.get({ bookId: 123 }, [{name: "Authorization", value: "Bearer abc123"}]).then((response) => { console.log(response) });
-    api.post({ bookId: 123 }, [{name: "Authorization", value: "Bearer abc123"}]).then((response) => { console.log(response) });
+    api.get(
+        { action: "hello" },
+        [{ name: "Authorization", value: "Bearer abc123" }]
+    ).then((response) => { console.log(response) });
+
+    api.post(
+        { bookId: 123 },
+        [{ name: "Authorization", value: "Bearer abc123" }]
+    ).then((response) => { console.log(response) });
 
 </script>
 Open the console to see the results

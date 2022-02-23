@@ -34,7 +34,7 @@ class ApiHelper {
                 }
 
                 if (method == "get") {
-                    url += "?" + encodeURIComponent(stringParameters);
+                    url += "?payload=" + encodeURIComponent(stringParameters);
                 }
 
                 let xhr = new XMLHttpRequest();

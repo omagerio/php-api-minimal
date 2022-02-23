@@ -7,7 +7,7 @@ if (!file_exists(__DIR__ . "/../env.php")) {
 }
 
 require(__DIR__ . "/../env.php");
-require(__DIR__ . "/rb.php");
+require(__DIR__ . "/orm.php");
 require(__DIR__ . "/config.php");
 
 class ApiResponse
@@ -24,23 +24,12 @@ class ApiResponse
     }
 }
 
-$apiHandlers = array();
-
-function addApiHandler($handler)
-{
-    global $apiHandlers;
-    $apiHandlers[] = $handler;
-}
-
-$handlersFiles = scandir(__DIR__ . "/../handlers");
-foreach ($handlersFiles as $handlerFile) {
-    if (substr($handlerFile, -4) == ".php") {
-        include(__DIR__ . "/../handlers/" . $handlerFile);
-    }
-}
-
-R::setup($configs->connectionString, $configs->dbUser, $configs->dbPassword);
-R::freeze(true); // we do not want this API to change the database structure, do we?
+$orm = new DbOrm(
+    $configs->db_host,
+    $configs->db_user,
+    $configs->db_pass,
+    $configs->db_name
+);
 
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Methods: *");
@@ -50,10 +39,25 @@ header("Content-type: application/json; charset=utf8");
 
 $response = new ApiResponse();
 
+function handleRequest($request)
+{
+    global $orm;
+    $response = new ApiResponse();
+
+    $handlersFiles = scandir(__DIR__ . "/../handlers");
+    foreach ($handlersFiles as $handlerFile) {
+        if (substr($handlerFile, -4) == ".php") {
+            include(__DIR__ . "/../handlers/" . $handlerFile);
+        }
+    }
+
+    return $response;
+}
+
 try {
 
     if ($_SERVER["REQUEST_METHOD"] == "GET") {
-        $input = urldecode($_SERVER["QUERY_STRING"]);
+        $input = $_GET["payload"];
     } else {
         $input = file_get_contents("php://input");
     }
@@ -64,9 +68,8 @@ try {
         throw new Exception("Json Error: " . $jsonError);
     }
 
-    foreach ($apiHandlers as $apiHandler) {
-        $response = call_user_func($apiHandler, $request, $response);
-    }
+    $response = handleRequest($request);
+
 } catch (Exception $e) {
     $response->errors[] = $e->getMessage();
 }
