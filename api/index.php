@@ -1,4 +1,3 @@
 <?php
-
-// Boot up the api service
+require("inc/includes.php");
 require("inc/init.php");

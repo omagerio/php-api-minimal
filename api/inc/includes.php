@@ -1,13 +1,11 @@
 <?php
-ini_set("error_reporting", 9999999999);
-ini_set("display_errors", 1);
 
-if (!file_exists(__DIR__ . "/../env.php")) {
+if (!file_exists(__DIR__ . "/../.env")) {
     die("Missing env.php file in api folder");
 }
 
-require(__DIR__ . "/../env.php");
-require(__DIR__ . "/orm.php");
+$GLOBALS["ENV_NAME"] = file_get_contents(__DIR__ . "/../.env");
+
 require(__DIR__ . "/config.php");
 
 class ApiResponse
@@ -24,6 +22,26 @@ class ApiResponse
     }
 }
 
+function handleRequest($request)
+{
+    global $orm;
+    $response = new ApiResponse();
+
+    $handlersFiles = scandir(__DIR__ . "/../handlers");
+    foreach ($handlersFiles as $handlerFile) {
+        if (substr($handlerFile, -4) == ".php") {
+            $include_response = require(__DIR__ . "/../handlers/" . $handlerFile);
+            if($include_response != null){
+                break;
+            }
+        }
+    }
+
+    return $response;
+}
+
+require(__DIR__ . "/orm.php");
+
 $orm = new DbOrm(
     $configs->db_host,
     $configs->db_user,
@@ -39,21 +57,6 @@ header("Content-type: application/json; charset=utf8");
 
 $response = new ApiResponse();
 
-function handleRequest($request)
-{
-    global $orm;
-    $response = new ApiResponse();
-
-    $handlersFiles = scandir(__DIR__ . "/../handlers");
-    foreach ($handlersFiles as $handlerFile) {
-        if (substr($handlerFile, -4) == ".php") {
-            include(__DIR__ . "/../handlers/" . $handlerFile);
-        }
-    }
-
-    return $response;
-}
-
 try {
 
     if ($_SERVER["REQUEST_METHOD"] == "GET") {
@@ -68,9 +71,12 @@ try {
         throw new Exception("Json Error: " . $jsonError);
     }
 
+    if($request == null){
+        $request = new stdClass();
+    }
+
     $request->headers = getallheaders();
     $response = handleRequest($request);
-
 } catch (Exception $e) {
     $response->errors[] = $e->getMessage();
 }

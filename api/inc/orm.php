@@ -21,18 +21,6 @@ class DbOrm
         return $objArray;
     }
 
-    protected function getValuesString($item)
-    {
-        $columns = array_keys(get_object_vars($item));
-        $values = [];
-        foreach ($columns as $column) {
-            $value = $item->{$column};
-            $values[] = $item->{$column} === null ? "NULL" : '"' . $this->conn->real_escape_string($item->{$column}) . '"';
-        }
-
-        return implode(",", $values);
-    }
-
     protected function getSetString($item)
     {
         $columns = array_keys(get_object_vars($item));
