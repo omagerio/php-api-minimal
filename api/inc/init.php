@@ -28,6 +28,7 @@ try {
 
     $request->headers = getallheaders();
     $response = handleRequest($request);
+
 } catch (Exception $e) {
     $response->errors[] = $e->getMessage();
 }

@@ -12,8 +12,15 @@ $configs->db_name = "db";
 
 // Environment configurations
 if ($GLOBALS["ENV_NAME"] == "dev") {
-    $configs->db_host = "localhost";
-    $configs->db_user = "omar";
-    $configs->db_pass = "omar";
-    $configs->db_name = "gmbpresse_app";
+    $configs->db_host = "";
+    $configs->db_user = "";
+    $configs->db_pass = "";
+    $configs->db_name = "";
+}
+
+if ($GLOBALS["ENV_NAME"] == "staging") {
+    $configs->db_host = "";
+    $configs->db_user = "";
+    $configs->db_pass = "";
+    $configs->db_name = "";
 }

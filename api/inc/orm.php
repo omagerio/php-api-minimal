@@ -21,6 +21,29 @@ class DbOrm
         return $objArray;
     }
 
+    protected function getWhereString($where, $whereParams)
+    {
+        foreach ($whereParams as $param) {
+            $pos = strpos($where, "?");
+            if ($pos !== false) {
+                $where = substr_replace($where, '"' . $this->conn->escape_string($param) . '"', $pos, 1);
+            }
+        }
+        return $where;
+    }
+
+    protected function getValuesString($item)
+    {
+        $columns = array_keys(get_object_vars($item));
+        $values = [];
+        foreach ($columns as $column) {
+            $value = $item->{$column};
+            $values[] = $item->{$column} === null ? "NULL" : '"' . $this->conn->real_escape_string($item->{$column}) . '"';
+        }
+
+        return implode(",", $values);
+    }
+
     protected function getSetString($item)
     {
         $columns = array_keys(get_object_vars($item));
@@ -31,10 +54,9 @@ class DbOrm
         return implode(",", $set);
     }
 
-    public function put($table, $item, $where = null, $whereParams = array())
+    public function put($table, $item)
     {
-
-        if ($where == null) {
+        if (!isset($item->id)) {
             $columns = array_keys(get_object_vars($item));
             $preparedParams = array();
             foreach ($columns as $column) {
@@ -44,11 +66,13 @@ class DbOrm
             $query = "INSERT INTO " . $table . " (" . implode(",", $columns) . ") VALUES (" . implode(",", $preparedParams) . ")";
 
             $stmt = $this->conn->prepare($query);
-            if (!$stmt) {
+            if ($this->conn->error != null) {
                 die($this->conn->error);
             }
             $stmt = $this->bindParams($stmt, array_values(get_object_vars($item)));
         } else {
+            $where = " id = ? ";
+            $whereParams  = [$item->id];
             $query = "UPDATE " . $table . " SET " . $this->getSetString($item) . " WHERE " . $where;
             $stmt = $this->conn->prepare($query);
             if (!$stmt) {
@@ -58,6 +82,12 @@ class DbOrm
         }
 
         $stmt->execute();
+
+        $error = $stmt->error;
+        if($error != null){
+            die($error);
+        }
+
         return $this->conn->insert_id;
     }
 
