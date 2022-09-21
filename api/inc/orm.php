@@ -54,9 +54,15 @@ class DbOrm
         return implode(",", $set);
     }
 
-    public function put($table, $item)
+    public function put($table, &$item)
     {
-        if (!isset($item->id)) {
+        $is_insert = true;
+        if(isset($item->id)){
+            $db_item = $this->read($table, "id=?", [$item->id]);
+            $is_insert = $db_item == null;
+        }
+
+        if ($is_insert) {
             $columns = array_keys(get_object_vars($item));
             $preparedParams = array();
             foreach ($columns as $column) {
@@ -67,7 +73,7 @@ class DbOrm
 
             $stmt = $this->conn->prepare($query);
             if ($this->conn->error != null) {
-                die($this->conn->error);
+                throw new Exception($this->conn->error);
             }
             $stmt = $this->bindParams($stmt, array_values(get_object_vars($item)));
         } else {
@@ -76,19 +82,21 @@ class DbOrm
             $query = "UPDATE " . $table . " SET " . $this->getSetString($item) . " WHERE " . $where;
             $stmt = $this->conn->prepare($query);
             if (!$stmt) {
-                die($this->conn->error);
+                throw new Exception($this->conn->error);
             }
             $stmt = $this->bindParams($stmt, $whereParams);
         }
 
         $stmt->execute();
+        $insert_id = $this->conn->insert_id;
+        if($insert_id != null){
+            $item->id = $insert_id;
+        }
 
         $error = $stmt->error;
         if($error != null){
-            die($error);
+            throw new Exception($error);
         }
-
-        return $this->conn->insert_id;
     }
 
     public function delete($table, $where = null, $whereParams = array())
@@ -96,7 +104,7 @@ class DbOrm
         $query = "DELETE FROM " . $table . ($where != null ? " WHERE " . $where : "");
         $stmt = $this->conn->prepare($query);
         if (!$stmt) {
-            die($this->conn->error);
+            throw new Exception($this->conn->error);
         }
         $stmt = $this->bindParams($stmt, $whereParams);
         $stmt->execute();
@@ -130,7 +138,7 @@ class DbOrm
 
         $stmt = $this->conn->prepare($query);
         if (!$stmt) {
-            die($this->conn->error);
+            throw new Exception($this->conn->error);
         }
         $stmt = $this->bindParams($stmt, $whereParams);
 

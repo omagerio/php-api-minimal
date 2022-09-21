@@ -6,20 +6,27 @@ $configs = new stdClass();
 
 // Default configurations
 $configs->db_host = "localhost";
-$configs->db_user = "user";
-$configs->db_pass = "pass";
-$configs->db_name = "db";
+$configs->db_user = "";
+$configs->db_pass = "";
+$configs->db_name = "";
 
 // Environment configurations
-if ($GLOBALS["ENV_NAME"] == "dev") {
-    $configs->db_host = "";
+if ($GLOBALS["ENV_NAME"] == "develop") {
+    $configs->db_host = "localhost";
     $configs->db_user = "";
     $configs->db_pass = "";
     $configs->db_name = "";
 }
 
 if ($GLOBALS["ENV_NAME"] == "staging") {
-    $configs->db_host = "";
+    $configs->db_host = "localhost";
+    $configs->db_user = "";
+    $configs->db_pass = "";
+    $configs->db_name = "";
+}
+
+if ($GLOBALS["ENV_NAME"] == "master") {
+    $configs->db_host = "localhost";
     $configs->db_user = "";
     $configs->db_pass = "";
     $configs->db_name = "";

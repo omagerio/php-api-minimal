@@ -7,7 +7,7 @@ A minimal PHP API server to be used as a starting point.
 - Copy the "api" folder inside a folder reachable by the internet
 - Create new handlers inside the "handlers" folder (you can start from the main.php script). Script inside this folder are included automatically. Define your custom logic here: `$request` contains the request's parameters. `$response` is the object returned to the clients
 - (Optional) Edit the `inc/config.php` script by adding your database connection
-- Clone the `.env.example` file to `.env` and add the name of your environment
+- Clone the `env.example` file to `env` and add the name of your environment
 
 ## Request Example
 ```json
